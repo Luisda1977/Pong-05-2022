@@ -46,10 +46,14 @@ class Pong:
     def bucle_principal(self):
         print("Estoy en el bucle principal")
         while True:
-            pygame.draw.rect(self.pantalla, (255, 255, 255), self.jugador1)
-            pygame.draw.rect(self.pantalla, (255, 255, 255), self.jugador2)
+            for evento in pygame.event.get():
+                if evento.type == pygame.KEYDOWN:
+                    if evento.key == pygame.K_ESCAPE:
+                        return
+            pygame.draw.rect(self.pantalla, (0, 255, 0), self.jugador1)
+            pygame.draw.rect(self.pantalla, (0, 0, 255), self.jugador2)
             pygame.display.flip()
-            pygame.draw.line(self.pantalla, (255, 255, 255), (self._ANCHO/2, 0), (self._ANCHO/2, self._ALTO))
+            pygame.draw.line(self.pantalla, (255, 0, 0), (self._ANCHO/2, 0), (self._ANCHO/2, self._ALTO))
 
 if __name__ == "__main__":
     juego = Pong()
