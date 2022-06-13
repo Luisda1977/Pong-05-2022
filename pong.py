@@ -17,8 +17,8 @@ class Paleta(pygame.Rect):
 
 class Pong:
 
-    _ALTO = 200
-    _ANCHO = 320
+    _ALTO = 400
+    _ANCHO = 640
     _MARGEN_LATERAL = 40
 
     _ANCHO_PALETA = 10
@@ -49,6 +49,7 @@ class Pong:
             pygame.draw.rect(self.pantalla, (255, 255, 255), self.jugador1)
             pygame.draw.rect(self.pantalla, (255, 255, 255), self.jugador2)
             pygame.display.flip()
+            pygame.draw.line(self.pantalla, (255, 255, 255), (self._ANCHO/2, 0), (self._ANCHO/2, self._ALTO))
 
 if __name__ == "__main__":
     juego = Pong()
