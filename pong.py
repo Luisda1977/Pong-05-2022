@@ -50,10 +50,16 @@ class Pong:
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_ESCAPE:
                         return
+                if evento.type == pygame.QUIT:
+                    return
+
+            for position in range(0, self._ALTO, 40):
+                color = (255, 255, 255)        
+                pygame.draw.line(self.pantalla, color, (self._ANCHO/2, position), (self._ANCHO/2, position +10))
+                # pygame.draw.line(self.pantalla, (255, 0, 0), (self._ANCHO/2, 0), (self._ANCHO/2, self._ALTO))        
             pygame.draw.rect(self.pantalla, (0, 255, 0), self.jugador1)
             pygame.draw.rect(self.pantalla, (0, 0, 255), self.jugador2)
             pygame.display.flip()
-            pygame.draw.line(self.pantalla, (255, 0, 0), (self._ANCHO/2, 0), (self._ANCHO/2, self._ALTO))
 
 if __name__ == "__main__":
     juego = Pong()
