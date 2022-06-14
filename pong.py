@@ -10,6 +10,7 @@ ANCHO = 640
 MARGEN_LATERAL = 40
 
 TAMANYO_PELOTA = 6
+VELO_MAX_PELOTA = 5
 
 """
  -algo de herencia:
@@ -48,8 +49,11 @@ class Pelota(pygame.Rect):
             (ANCHO-TAMANYO_PELOTA)/2, (ALTO-TAMANYO_PELOTA)/2, 
             TAMANYO_PELOTA, TAMANYO_PELOTA
             )
-        self.velocidad_x = randint(-5, 5)
-        self.velocidad_y = randint(-5, 5)
+        
+        self.velocidad_x = 0
+        while self.velocidad_x == 0:
+            self.velocidad_x = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
+        self.velocidad_y = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
 
     def muevete(self):
         self.y = self.y + self.velocidad_y
@@ -60,6 +64,20 @@ class Pelota(pygame.Rect):
         if self.y > ALTO - TAMANYO_PELOTA:
             self.y = ALTO - TAMANYO_PELOTA
             self.velocidad_y = -self.velocidad_y
+
+    def comprobar_punto(self):
+        if self.x < 0:
+            self.velocidad_x = randint(-VELO_MAX_PELOTA, -1)
+            self.x = (ANCHO - TAMANYO_PELOTA)/2
+            self.y = (ALTO - TAMANYO_PELOTA)/2
+            self.velocidad_y = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
+            print("Punto para el jugador 2")
+        elif self.x > ANCHO:
+            self.velocidad_x = randint(1, VELO_MAX_PELOTA)
+            self.x = (ANCHO - TAMANYO_PELOTA)/2
+            self.y = (ALTO - TAMANYO_PELOTA)/2
+            self.velocidad_y = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
+            print("Punto para el jugador 1")
 
 """
 -el movimiento es cosa de la paleta
@@ -111,6 +129,7 @@ class Pong:
 
             self.colision_paletas()
 
+            self.pelota.comprobar_punto()
 
             self.pantalla.fill((0, 0, 0))
 
@@ -133,8 +152,10 @@ class Pong:
         y le cambia la dirección. (pygame.Rect.colliderect(Rect))
         """
         if self.pelota.colliderect(self.jugador1) or self.pelota.colliderect(self.jugador2):
-            self.pelota.velocidad_x = -self.pelota.velocidad_x + randint (-3, 3)
-            self.pelota.velocidad_y = randint(-5, 5)
+            #self.pelota.velocidad_x = -self.pelota.velocidad_x + randint (-VELO_MAX_PELOTA//2, VELO_MAX_PELOTA//2)
+            #if self.pelota.velocidad_x > VELO_MAX_PELOTA:
+            self.pelota.velocidad_x = self.pelota.velocidad_x
+            self.pelota.velocidad_y = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
 
 
 if __name__ == "__main__":
