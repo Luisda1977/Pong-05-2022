@@ -54,6 +54,12 @@ class Pelota(pygame.Rect):
     def muevete(self):
         self.y = self.y + self.velocidad_y
         self.x = self.x + self.velocidad_x
+        if self.y < 0:
+            self.y = 0
+            self.velocidad_y = -self.velocidad_y
+        if self.y > ALTO - TAMANYO_PELOTA:
+            self.y = ALTO - TAMANYO_PELOTA
+            self.velocidad_y = -self.velocidad_y
 
 """
 -el movimiento es cosa de la paleta
