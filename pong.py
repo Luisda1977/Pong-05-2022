@@ -108,6 +108,10 @@ class Pong:
             if estado_teclas[pygame.K_m]:
                 self.jugador2.muevete(Paleta.ABAJO)
             self.pelota.muevete()
+
+            self.colision_paletas()
+
+
             self.pantalla.fill((0, 0, 0))
 
             # for position in range(0, self._ALTO, 40):     #linea discontinua
@@ -122,6 +126,15 @@ class Pong:
             #refresco de pantalla
             pygame.display.flip()
             self.clock.tick(60)
+
+    def colision_paletas(self):
+        """
+        -Comprueba si la pelota ha colisionado con la paleta.
+        y le cambia la dirección. (pygame.Rect.colliderect(Rect))
+        """
+        if self.pelota.colliderect(self.jugador1) or self.pelota.colliderect(self.jugador2):
+            self.pelota.velocidad_x = -self.pelota.velocidad_x
+
 
 if __name__ == "__main__":
     juego = Pong()
