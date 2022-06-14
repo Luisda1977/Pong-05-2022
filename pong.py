@@ -133,7 +133,8 @@ class Pong:
         y le cambia la dirección. (pygame.Rect.colliderect(Rect))
         """
         if self.pelota.colliderect(self.jugador1) or self.pelota.colliderect(self.jugador2):
-            self.pelota.velocidad_x = -self.pelota.velocidad_x
+            self.pelota.velocidad_x = -self.pelota.velocidad_x + randint (-3, 3)
+            self.pelota.velocidad_y = randint(-5, 5)
 
 
 if __name__ == "__main__":
