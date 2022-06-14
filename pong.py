@@ -1,8 +1,15 @@
-from ssl import ALERT_DESCRIPTION_BAD_CERTIFICATE_HASH_VALUE
+from random import randint
+
 import pygame
 
 ANCHO_PALETA = 5
 ALTO_PALETA = 40
+
+ALTO = 400
+ANCHO = 640
+MARGEN_LATERAL = 40
+
+TAMANYO_PELOTA = 6
 
 """
  -algo de herencia:
@@ -27,70 +34,88 @@ class Paleta(pygame.Rect):
 
     def muevete(self, direccion):
         if direccion == self.ARRIBA:
-            print("Muevete arriba")
+            self.y = self.y - self.velocidad
+            if self.y < 0:
+                self.y = 0
         else:
-            print("Muevete abajo") 
+            self.y = self.y + self.velocidad
+            if self.y > ALTO - ALTO_PALETA:
+                self.y = ALTO - ALTO_PALETA 
+
+class Pelota(pygame.Rect):
+    def __init__(self):
+        super(Pelota, self). __init__(
+            (ANCHO-TAMANYO_PELOTA)/2, (ALTO-TAMANYO_PELOTA)/2, 
+            TAMANYO_PELOTA, TAMANYO_PELOTA
+            )
+        self.velocidad_x = randint(-5, 5)
+        self.velocidad_y = randint(-5, 5)
+
+    def muevete(self):
+        self.y = self.y + self.velocidad_y
+        self.x = self.x + self.velocidad_x
 
 """
 -el movimiento es cosa de la paleta
 -aumentar o disminuir el valor del eje y posición de la paleta
 -quien tiene que capturar el evento de pulsar la tecla es el cucle principal
-redibujar la paleta
-
+-redibujar la paleta
 """
 
 class Pong:
-
-    _ALTO = 400
-    _ANCHO = 640
-    _MARGEN_LATERAL = 40
-
-
-
+    
     def __init__(self):
-        print("Construyendo un objeto pong")
         pygame.init()
-        self.pantalla = pygame.display.set_mode((self._ANCHO, self._ALTO))
+        self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
+        self.clock = pygame.time.Clock()
 
         self.jugador1 = Paleta(
-            self._MARGEN_LATERAL,                     #coordenada x (left)
-            (self._ALTO-ALTO_PALETA)/2)         #coordenada y (top)   
+            MARGEN_LATERAL,               #coordenada x (left)
+            (ALTO-ALTO_PALETA)/2)         #coordenada y (top)   
             
 
         self.jugador2 = Paleta(
-            self._ANCHO-self._MARGEN_LATERAL-ANCHO_PALETA,
-            (self._ALTO-ALTO_PALETA)/2)
-        
+            ANCHO-MARGEN_LATERAL-ANCHO_PALETA,
+            (ALTO-ALTO_PALETA)/2)
 
+        self.pelota = Pelota ()
         
 
     def bucle_principal(self):
-        print("Estoy en el bucle principal")
-        while True:
+        salir = False
+        while not salir:
             for evento in pygame.event.get():
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_ESCAPE:
-                        salir = True
-                    elif evento.key == pygame.K_a:
-                        self.jugador1.muevete(Paleta.ARRIBA)
-                    elif evento.key == pygame.K_z:
-                        self.jugador1.muevete(Paleta.ABAJO)
-                    elif evento.key == pygame.K_k:
-                        self.jugador2.muevete(Paleta.ARRIBA)
-                    elif evento.key == pygame.K_m:
-                        self.jugador1.muevete(Paleta.ABAJO)
-
-
+                        print("Adiós, te has escapado")
+                        salir = True                    
                 if evento.type == pygame.QUIT:
-                    return
+                    salir = True
+            
+            estado_teclas = pygame.key.get_pressed()
+            if estado_teclas[pygame.K_a]:
+                self.jugador1.muevete(Paleta.ARRIBA)
+            if estado_teclas[pygame.K_z]:
+                 self.jugador1.muevete(Paleta.ABAJO)
+            if estado_teclas[pygame.K_k]:
+                self.jugador2.muevete(Paleta.ARRIBA)
+            if estado_teclas[pygame.K_m]:
+                self.jugador2.muevete(Paleta.ABAJO)
+            self.pelota.muevete()
+            self.pantalla.fill((0, 0, 0))
 
             # for position in range(0, self._ALTO, 40):     #linea discontinua
                 # color = (255, 255, 255)        
                 # pygame.draw.line(self.pantalla, color, (self._ANCHO/2, position), (self._ANCHO/2, position +10))
-            pygame.draw.line(self.pantalla, (255, 0, 0), (self._ANCHO/2, 0), (self._ANCHO/2, self._ALTO))        
+               
+            pygame.draw.line(self.pantalla, (255, 0, 0), (ANCHO/2, 0), (ANCHO/2, ALTO))        
             pygame.draw.rect(self.pantalla, (0, 255, 0), self.jugador1)
             pygame.draw.rect(self.pantalla, (0, 0, 255), self.jugador2)
+            pygame.draw.rect(self.pantalla, (255, 255, 255), self.pelota)
+
+            #refresco de pantalla
             pygame.display.flip()
+            self.clock.tick(60)
 
 if __name__ == "__main__":
     juego = Pong()
