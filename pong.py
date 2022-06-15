@@ -2,15 +2,21 @@ from random import randint
 
 import pygame
 
-ANCHO_PALETA = 5
 ALTO_PALETA = 40
+ANCHO_PALETA = 5
+VELOCIDAD_PALA = 5
 
-ALTO = 400
 ANCHO = 640
+ALTO = 480
 MARGEN_LATERAL = 40
 
 TAMANYO_PELOTA = 6
 VELO_MAX_PELOTA = 5
+
+C_NEGRO = (0, 0, 0,)
+C_BLANCO = (255, 255, 255)
+
+FPS = 60
 
 PUNTOS_PARTIDA = 3
 
@@ -33,7 +39,7 @@ class Paleta(pygame.Rect):
 
     def __init__(self, x, y):
         super(Paleta, self).__init__(x, y, ANCHO_PALETA, ALTO_PALETA)
-        self.velocidad = 5
+        self.velocidad = VELOCIDAD_PALA
 
     def muevete(self, direccion):
         if direccion == self.ARRIBA:
@@ -55,11 +61,12 @@ class Pelota(pygame.Rect):
         self.velocidad_x = 0
         while self.velocidad_x == 0:
             self.velocidad_x = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
+
         self.velocidad_y = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
 
     def muevete(self):
-        self.y = self.y + self.velocidad_y
         self.x = self.x + self.velocidad_x
+        self.y = self.y + self.velocidad_y
         if self.y < 0:
             self.y = 0
             self.velocidad_y = -self.velocidad_y
@@ -100,7 +107,7 @@ class Marcador:
 -redibujar la paleta
 """
 
-class Pong:
+class Pong: 
     
     def __init__(self):
         pygame.init()
@@ -116,7 +123,8 @@ class Pong:
             ANCHO-MARGEN_LATERAL-ANCHO_PALETA,
             (ALTO-ALTO_PALETA)/2)
 
-        self.pelota = Pelota ()
+        self.pelota = Pelota()
+        self.marcador = Marcador()
         
 
     def bucle_principal(self):
@@ -126,7 +134,10 @@ class Pong:
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_ESCAPE:
                         print("Adiós, te has escapado")
-                        salir = True                    
+                        salir = True
+                    if evento.key == pygame.K_r:
+                        print("Iniciamos nueva partida")
+                        self.marcador.inicializar()
                 if evento.type == pygame.QUIT:
                     salir = True
             
@@ -139,49 +150,47 @@ class Pong:
                 self.jugador2.muevete(Paleta.ARRIBA)
             if estado_teclas[pygame.K_m]:
                 self.jugador2.muevete(Paleta.ABAJO)
-            self.pelota.muevete()
 
-            self.colision_paletas()
+            if not self.marcador.comprobar_ganador():
+                self.pelota.muevete()
+                self.colision_paletas()
+                self.comprobar_punto()
 
-            self.comprobar_punto()
-
-            self.pantalla.fill((0, 0, 0))
-
+            self.pantalla.fill(C_NEGRO)
             # for position in range(0, self._ALTO, 40):     #linea discontinua
                 # color = (255, 255, 255)        
-                # pygame.draw.line(self.pantalla, color, (self._ANCHO/2, position), (self._ANCHO/2, position +10))
-               
-            pygame.draw.line(self.pantalla, (255, 255, 255), (ANCHO/2, 0), (ANCHO/2, ALTO))        
-            pygame.draw.rect(self.pantalla, (255, 255, 255), self.jugador1)
-            pygame.draw.rect(self.pantalla, (255, 255, 255), self.jugador2)
-            pygame.draw.rect(self.pantalla, (255, 255, 255), self.pelota)
+                # pygame.draw.line(self.pantalla, color, (self._ANCHO/2, position), (self._ANCHO/2, position +10))   
+            pygame.draw.line(self.pantalla, C_BLANCO, (ANCHO/2, 0), (ANCHO/2, ALTO))        
+            pygame.draw.rect(self.pantalla, C_BLANCO, self.jugador1)
+            pygame.draw.rect(self.pantalla, C_BLANCO, self.jugador2)
+            pygame.draw.rect(self.pantalla, C_BLANCO, self.pelota)
 
             #refresco de pantalla
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(FPS)
 
     def colision_paletas(self):
         """
         -Comprueba si la pelota ha colisionado con la paleta.
         y le cambia la dirección. (pygame.Rect.colliderect(Rect))
         """
-        if self.pelota.colliderect(self.jugador1) or self.pelota.colliderect(self.jugador2):
+        if pygame.Rect.colliderect(self.pelota, self.jugador1) or pygame.Rect.colliderect(self.pelota, self.jugador2):
             #self.pelota.velocidad_x = -self.pelota.velocidad_x + randint (-VELO_MAX_PELOTA//2, VELO_MAX_PELOTA//2)
             #if self.pelota.velocidad_x > VELO_MAX_PELOTA:
-            self.pelota.velocidad_x = self.pelota.velocidad_x
+            self.pelota.velocidad_x = -self.pelota.velocidad_x
             self.pelota.velocidad_y = randint(-VELO_MAX_PELOTA, VELO_MAX_PELOTA)
 
 
-    def comprobar_punto(self,marcador):
-        if self.x < 0:
-            self.marcador.valor[1] = self.marcador.valor[1]+1
+    def comprobar_punto(self):
+        if self.pelota.x < 0:
+            self.marcador.valor[1] = self.marcador.valor[1] + 1
             print(f"El nuevo marcador es {self.marcador.valor}")
             self.pelota.velocidad_x = randint(-VELO_MAX_PELOTA, -1)
             self.iniciar_punto()
-        elif self.x > ANCHO:
-            self.marcador.valor[1] = self.marcador.valor[1]+1
+        elif self.pelota.x > ANCHO:
+            self.marcador.valor[0] = self.marcador.valor[0] + 1
             print(f"El nuevo marcador es {self.marcador.valor}")
-            self.pelota.velocidad_x = randint(1, -VELO_MAX_PELOTA)
+            self.pelota.velocidad_x = randint(1, VELO_MAX_PELOTA)
             self.iniciar_punto()
 
     def iniciar_punto(self):
