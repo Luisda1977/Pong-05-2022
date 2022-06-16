@@ -114,6 +114,10 @@ class Pong:
         self.pantalla = pygame.display.set_mode((ANCHO, ALTO))
         self.clock = pygame.time.Clock()
 
+        #Vamos a prepararnos para pintar texto
+        pygame.font.init()
+        self.tipografia = pygame.font.SysFont("roboto", 50) #TIPOGRAFÍA Y TAMAÑO
+
         self.jugador1 = Paleta(
             MARGEN_LATERAL,               #coordenada x (left)
             (ALTO-ALTO_PALETA)/2)         #coordenada y (top)   
@@ -128,6 +132,11 @@ class Pong:
         
 
     def bucle_principal(self):
+
+        texto = pygame.font.Font.render(self.tipografia, "Como mola PONG", False, C_BLANCO, (100, 0, 0)) #MARCADOR Y TIPOGRAFÍA
+        texto_x = ANCHO/2 - texto.get_width()/2                                            #MARCADOR Y TIPOGRAFÍA
+        texto_y = ALTO/2 - texto.get_height()/2                                             #MARCADOR Y TIPOGRAFÍA
+
         salir = False
         while not salir:
             for evento in pygame.event.get():
@@ -164,6 +173,8 @@ class Pong:
             pygame.draw.rect(self.pantalla, C_BLANCO, self.jugador1)
             pygame.draw.rect(self.pantalla, C_BLANCO, self.jugador2)
             pygame.draw.rect(self.pantalla, C_BLANCO, self.pelota)
+
+            self.pantalla.blit(texto, (texto_x, texto_y)) 
 
             #refresco de pantalla
             pygame.display.flip()
